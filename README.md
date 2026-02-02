@@ -377,7 +377,7 @@ auto canvasHouse = make_shared<Texture>();
 CANVAS-Square.SetTexture(canvasHouse);
 CANVAS-Ellipse.SetTexture(canvasHouse);
 ````
-✅ Честная диаграмма CANVAS (без лжи)
+✅ Диаграмма CANVAS
 
 ````
 CANVAS:
