@@ -403,5 +403,3 @@ CANVAS-Square  CANVAS-Ellipse
 ## 🎨 Графика: CANVAS
 ![CANVAS](images/canvas.png)
 
-## 🔴 Texture Source (рамки)
-![SOURCE](images/source.png)
