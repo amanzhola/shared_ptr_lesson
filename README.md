@@ -244,25 +244,142 @@ C:\...\Умные указатели\Умный указатель shared_ptr\sh
 
 ---
 
-## 🧠 Диаграммы владения (коротко)
+🧾 Легенда текстур
 
-### ШАГ 3
+HouseSceneTexture 🌤️🏠 — одна сцена: небо + солнце + дом + трава
+GreenFillTexture 🟩 — заливка 'G'
+BlueUnusedTexture 🟦 — создана, но никому не передана
+CanvasHouseScene 🎨 — отдельная текстура для CANVAS
 
-```
-houseScene → HouseSceneTexture ← square
-greenFill  → GreenFillTexture  ← ellipse
-```
+---
 
-### ШАГ 5
+````
+🔹 ШАГ 1 — Создание фигур
+Shape square;
+Shape ellipse;
+````
 
-```
-square → HouseSceneTexture ← ellipse
-(GreenFillTexture уничтожена)
-```
+📌 Важно: фигуры не владеют текстурами при создании.
 
-### CANVAS
+````
+square   (texture_ = nullptr)
+ellipse  (texture_ = nullptr)
+````
+---
+🔹 ШАГ 2 — Создание текстур (внутренний блок)
 
-```
+````
+auto houseScene = make_shared<Texture>();
+auto greenFill  = make_shared<Texture>();
+auto blueUnused = make_shared<Texture>();
+````
+Владение
+
+````
+houseScene  ──▶ HouseSceneTexture   (use_count = 1)
+greenFill   ──▶ GreenFillTexture    (use_count = 1)
+blueUnused  ──▶ BlueUnusedTexture   (use_count = 1)
+````
+---
+🔹 ШАГ 3 — SetTexture
+
+````
+square.SetTexture(houseScene);
+ellipse.SetTexture(greenFill);
+````
+Что реально происходит
+ - shared_ptr передаётся по значению
+ - параметр функции — копия
+ - use_count увеличивается на входе в функцию
+
+Итоговое владение
+````
+ШАГ 3:
+
+houseScene ──▶ HouseSceneTexture ◀── square
+greenFill  ──▶ GreenFillTexture  ◀── ellipse
+blueUnused ──▶ BlueUnusedTexture
+````
+````
+HouseSceneTexture  use_count = 2
+GreenFillTexture   use_count = 2
+BlueUnusedTexture  use_count = 1
+````
+---
+🔹 Выход из блока
+````
+} // конец блока
+````
+
+blueUnused уничтожается:
+
+````
+BlueUnusedTexture 💥 destroyed
+````
+
+Осталось:
+````
+square  ──▶ HouseSceneTexture
+ellipse ──▶ GreenFillTexture
+````
+---
+🔹 ШАГ 5 — ellipse.SetTexture(square.GetTexture())
+````
+ellipse.SetTexture(square.GetTexture());
+````
+Что происходит
+ - ellipse теряет GreenFillTexture
+ - GreenFillTexture больше никто не держит → 💥 уничтожена
+ - ellipse получает HouseSceneTexture
+
+Итог
+````
+ШАГ 5:
+
+square  ──▶ HouseSceneTexture ◀── ellipse
+````
+````
+HouseSceneTexture  use_count = 2
+GreenFillTexture   💥 destroyed
+````
+---
+🔹 ШАГ 6 — square.ResetTexture()
+
+````
+square.ResetTexture();
+````
+Итог
+
+````
+ellipse ──▶ HouseSceneTexture
+````
+````
+HouseSceneTexture  use_count = 1
+````
+---
+🔹 ШАГ 7 — ellipse.ResetTexture()
+````
+ellipse.ResetTexture();
+````
+Итог
+````
+HouseSceneTexture 💥 destroyed
+````
+
+Владельцев не осталось — объект удалён.
+---
+
+````
+🎨 CANVAS — отдельный сценарий (не связан с шагами выше)
+auto canvasHouse = make_shared<Texture>();
+CANVAS-Square.SetTexture(canvasHouse);
+CANVAS-Ellipse.SetTexture(canvasHouse);
+````
+✅ Честная диаграмма CANVAS (без лжи)
+
+````
+CANVAS:
+
 canvasHouse
      │
      ▼
@@ -272,24 +389,27 @@ canvasHouse
      ▲            ▲
      │            │
 CANVAS-Square  CANVAS-Ellipse
-```
+````
+Факты
+
+❌ фигуры не владеют друг другом
+❌ нет “иерархии”
+✅ три равных владельца (shared_ptr)
+✅ use_count = 3
 
 ---
+🖼️ Скриншоты (опционально)
 
-## 🎨 Графика: CANVAS (скриншот)
+Создай папку images/ и положи туда:
 
-> Если хочешь вставить картинки — сохрани скриншоты как:
+images/canvas.png
 
-* `images/canvas.png`
-* `images/source.png`
+images/source.png
 
-И добавь:
+И вставь:
 
-```md
 ## 🎨 Графика: CANVAS
 ![CANVAS](images/canvas.png)
 
 ## 🔴 Texture Source (рамки)
 ![SOURCE](images/source.png)
-```
-
