@@ -398,18 +398,10 @@ CANVAS-Square  CANVAS-Ellipse
 ✅ use_count = 3
 
 ---
-🖼️ Скриншоты (опционально)
-
-Создай папку images/ и положи туда:
-
-images/canvas.png
-
-images/source.png
-
-И вставь:
+🖼️ Скриншоты
 
 ## 🎨 Графика: CANVAS
-![CANVAS](images/canvas.png)
+![CANVAS](images/Снимок экрана 2026-02-01 205901.png)
 
 ## 🔴 Texture Source (рамки)
 ![SOURCE](images/source.png)
