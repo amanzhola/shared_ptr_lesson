@@ -401,7 +401,7 @@ CANVAS-Square  CANVAS-Ellipse
 🖼️ Скриншоты
 
 ## 🎨 Графика: CANVAS
-![CANVAS](images/Снимок экрана 2026-02-01 205901.png)
+![CANVAS](images/canvas.png)
 
 ## 🔴 Texture Source (рамки)
 ![SOURCE](images/source.png)
